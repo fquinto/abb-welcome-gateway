@@ -1,0 +1,20 @@
+{
+  "name": "bus-interface-abb-welcome",
+  "version": "1.0.0",
+  "description": "Bus Interface for ABB-Welcome doorbell — tscircuit project converted from EasyEDA.",
+  "main": "index.circuit.tsx",
+  "keywords": ["tscircuit", "pcb", "abb-welcome", "esp32"],
+  "scripts": {
+    "dev": "tsci dev",
+    "build": "tsci build",
+    "snapshot": "tsci snapshot",
+    "snapshot:update": "tsci snapshot --update",
+    "start": "tsci dev",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "tscircuit": "^0.0.1738",
+    "typescript": "^5.0.0"
+  }
+}
