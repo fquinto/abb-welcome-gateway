@@ -1,0 +1,23 @@
+{
+  "name": "easyeda-to-circuit-json",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "description": "Convert this project's EasyEDA schematic + PCB JSON into a circuit-json file.",
+  "scripts": {
+    "convert": "node convert.mjs",
+    "cache": "node convert.mjs --only-cache",
+    "validate": "node validate.mjs"
+  },
+  "dependencies": {
+    "circuit-json": "*",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "@tscircuit/circuit-json-util": "^0.0.94",
+    "circuit-json-to-connectivity-map": "^0.0.23",
+    "circuit-to-svg": "^0.0.345",
+    "schematic-symbols": "^0.0.224"
+  }
+}
