@@ -7,7 +7,7 @@ import { any_circuit_element } from "circuit-json";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..");
-const file = process.argv[2] || path.join(REPO_ROOT, "circuit.json");
+const file = process.argv[2] || path.join(REPO_ROOT, "hardware", "easyeda-v2", "circuit.json");
 
 const json = JSON.parse(fs.readFileSync(file, "utf8"));
 if (!Array.isArray(json)) { console.error("Expected an array of circuit elements"); process.exit(2); }

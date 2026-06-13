@@ -54,9 +54,12 @@
 //     BUS_GND     — bus return (terminal block, RX/TX front-end, status LED)
 //
 //   Bus signal nodes:
-//     BUS_RX_A     — analog RX after the front-end transistor stage
+//     BUS_RX_A     — high-side analog RX node from D4 (≈ bus voltage); the top
+//                    of the R1/R3 divider. MUST NOT reach a logic input.
 //     BUS_RX_FILT  — junction between R1/R3/R4/C3 in the RX bias network
 //     BUS_RX_BIAS  — base of Q1 (RX detector BJT)
+//     BUS_RX_DET   — Q1 open-collector detector output, pulled up to V3V3_ESP
+//                    by R2; this is the Schmitt INPUT (clean 0–3.3 V).
 //     BUS_RX_PIN   — Schmitt OUTPUT going to ESP32 GPIO4 (inverted!)
 //     BUS_TX_PIN   — ESP32 GPIO5 driving the TX chain
 //     TX_GATE      — gate of Q4/Q5 (post-R7)
@@ -124,7 +127,7 @@ export default () => (
       }} />
 
     {/* === F2 PTC polyfuse on the hot leg === */}
-    <chip name="F2" footprint="1206" manufacturerPartNumber="nSMD005" supplierPartNumbers={{ jlcpcb: ["C70064"] }}
+    <fuse name="F2" footprint="1206" manufacturerPartNumber="nSMD005" supplierPartNumbers={{ jlcpcb: ["C70064"] }}
       currentRating="0.5A" pcbX="12mm" pcbY="3mm" pcbRotation={90}
       connections={{ pin1: "net.BUS_HOT", pin2: "net.BUS_FUSED" }}
       cadModel={{ objUrl: "https://modelcdn.tscircuit.com/easyeda_models/assets/C70064.obj?uuid=7dbd95a5ee9a45949b72cb8147e267ff", stepUrl: "https://modelcdn.tscircuit.com/easyeda_models/assets/C70064.step?uuid=7dbd95a5ee9a45949b72cb8147e267ff" }} />
@@ -200,15 +203,18 @@ export default () => (
 
     {/* ============================================================
          BUS RX front-end (analog) — all on BUS_GND
-         BUS_PROT_IN → D4 → BUS_RX_A → (R1 100k, C3 68n) → BUS_RX_FILT
+         BUS_HOT_F → D4 → BUS_RX_A → (R1 100k, C3 68n) → BUS_RX_FILT
                                           ↓
                                        R3 10k ↑ BUS_GND
                                           ↓
                                        R4 1k → BUS_RX_BIAS → Q1.B (S8050)
-         BUS_GND → Q1.E,  BUS_RX_A ← Q1.C
-         D3 clamps Q1.B reverse to BUS_GND.
-         The 74LVC1G14 Schmitt (U3) reads BUS_RX_A and outputs BUS_RX_PIN
+         BUS_GND → Q1.E.  Q1.C → BUS_RX_DET (open-collector detector output,
+         pulled up to V3V3_ESP by R2). D3 clamps Q1.B reverse to BUS_GND.
+         The 74LVC1G14 Schmitt (U3) reads BUS_RX_DET and outputs BUS_RX_PIN
          to the ESP32 GPIO4 (note: Schmitt is INVERTED).
+         BUS_RX_A is the high-voltage (~bus) node and must NOT reach U3:
+         keeping the Schmitt on BUS_RX_DET (not BUS_RX_A) is what keeps the
+         74LVC1G14 input inside its VCC+0.5 V abs-max.
          ============================================================ */}
 
     <diode name="D4" footprint="sma" manufacturerPartNumber="SS24" supplierPartNumbers={{ jlcpcb: ["C7420362"] }}
@@ -229,11 +235,12 @@ export default () => (
       connections={{ pin1: "net.BUS_RX_FILT", pin2: "net.BUS_RX_BIAS" }} />
 
     <BJT_S8050 name="Q1" pcbX="-19.214mm" pcbY="-9.203mm"
-      connections={{ B: "net.BUS_RX_BIAS", E: "net.BUS_GND", C: "net.BUS_RX_A" }} />
+      connections={{ B: "net.BUS_RX_BIAS", E: "net.BUS_GND", C: "net.BUS_RX_DET" }} />
 
-    {/* R2 — 10k pullup from the Schmitt output BUS_RX_PIN to V3V3_ESP. */}
+    {/* R2 — 10k pullup on the Q1 open-collector detector output BUS_RX_DET
+       (= the Schmitt input) to V3V3_ESP. */}
     <resistor name="R2" footprint="0603" resistance="10k" pcbX="-19.214mm" pcbY="-6.282mm" pcbRotation={180}
-      connections={{ pin1: "net.BUS_RX_PIN", pin2: "net.V3V3_ESP" }} />
+      connections={{ pin1: "net.BUS_RX_DET", pin2: "net.V3V3_ESP" }} />
 
     {/* Q6 — pulls the RX-activity LED cathode down when the Schmitt
        output is high (driven by BUS_RX_PIN, source on BUS_GND). */}
@@ -373,7 +380,7 @@ export default () => (
 
     {/* ============================================================
          74LVC1G14 Schmitt trigger (U3)
-         pin1 = A (input ← BUS_RX_A), pin5 = VCC ← V3V3_ESP, pin2 = GND ← DGND,
+         pin1 = A (input ← BUS_RX_DET), pin5 = VCC ← V3V3_ESP, pin2 = GND ← DGND,
          pin3 = Y (output → BUS_RX_PIN), pin4 = NC.
          Output is INVERTED — set inverted: true in firmware.
          C_U3 = 100 nF, placed next to pin5.
@@ -382,7 +389,7 @@ export default () => (
     <chip name="U3" footprint="sot23_5" manufacturerPartNumber="74LVC1G14"
       pinLabels={{ pin1: ["A"], pin2: ["GND"], pin3: ["Y"], pin4: ["NC"], pin5: ["VCC"] }}
       pcbX="-9mm" pcbY="-1mm"
-      connections={{ A: "net.BUS_RX_A", GND: "net.DGND", Y: "net.BUS_RX_PIN", VCC: "net.V3V3_ESP" }} />
+      connections={{ A: "net.BUS_RX_DET", GND: "net.DGND", Y: "net.BUS_RX_PIN", VCC: "net.V3V3_ESP" }} />
     <capacitor name="C_U3" footprint="0603" capacitance="100nF"
       pcbX="-9mm" pcbY="-3.5mm" pcbRotation={90}
       connections={{ pin1: "net.V3V3_ESP", pin2: "net.DGND" }} />
