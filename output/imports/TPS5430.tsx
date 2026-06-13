@@ -1,14 +1,16 @@
 import type { ChipProps } from "@tscircuit/props"
 
+// TPS5430DDA (SO PowerPAD-8) datasheet pinout.
+// Pads 7 and 8 are both the switch node (PH) internally tied.
 const pinLabels = {
   pin1: ["BOOT"],
   pin2: ["VIN"],
   pin3: ["EN"],
   pin4: ["GND"],
   pin5: ["VSENSE"],
-  pin6: ["PH"],
+  pin6: ["NC"],
   pin7: ["PH"],
-  pin8: ["NC"],
+  pin8: ["PH"],
   pin9: ["EPAD"],
 } as const
 
