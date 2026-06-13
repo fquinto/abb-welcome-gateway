@@ -30,7 +30,10 @@ The header comment of `output/index.circuit.tsx` is the authoritative changelog 
 
 ### To verify before fabrication
 
-- **L2 = 100 µH output inductor** is high for a 500 kHz TPS5430 (the datasheet suggests ~10–22 µH). Inherited from the original design and presumably field-proven, but with the ~590 µF of bulk on `V3V3` the loop crossover is very low (sluggish transient response). Re-check against the datasheet if load-step response matters for the Wi-Fi current bursts.
+- **L2 = 100 µH output inductor — verified in-spec, but at the edge of it.** The TPS5430 datasheet (SLVS632L §7.2.1.2.4) explicitly allows **10–100 µH**, so 100 µH is *within* range (the 15–22 µH of the design examples is just the typical value, not a limit). The catch is the control loop: with ~590 µF of bulk on `V3V3` the LC corner is ~0.65 kHz and the computed crossover (Eq. 7/8) is ~1.5 kHz — **below TI's recommended 3–30 kHz window**, so the loop is stable but sluggish. The internal compensation relies on the ESR of the tantalum/aluminium bulk for its phase margin, which this design has. Implications:
+  - **Do not swap C19 / C6 / C2 / C4 for low-ESR ceramics** without adding the external compensation network (R3 / C6 / C7 from datasheet Fig. 7-11). The all-ceramic case *needs* it; this design omits it because it uses tantalum + aluminium.
+  - For a textbook crossover (3–30 kHz) and snappier transient response, the datasheet's standard recipe is **L ≈ 15 µH with ~100–220 µF** — also smaller on the board. Optional; the 100 µH value is inherited from the field-proven mat931 original.
+  - If keeping 100 µH, confirm with a bench load-step / Bode plot, since the operating point sits outside TI's recommended window.
 - **TVS1 clamp vs buck abs-max.** TVS1 (now `SMBJ30A`) clamps at ~48 V, above the TPS5430's 36 V abs-max VIN. L3's series impedance plus the buck's own 36 V headroom cover the 30–36 V band, but if you want tighter VIN protection, move the clamp ahead of L3 or use a higher-VIN buck.
 
 ### Optional hardening
