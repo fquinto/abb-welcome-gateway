@@ -14,8 +14,8 @@
   },
   "devDependencies": {
     "@types/react": "^19.2.14",
-    "circuit-json": "latest",
-    "tscircuit": "latest",
+    "circuit-json": "0.0.425",
+    "tscircuit": "0.0.1747",
     "typescript": "^5.0.0"
   }
 }

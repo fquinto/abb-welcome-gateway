@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  board:
+    name: Type-check board & check nets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Pure-node check, no install needed. Catches single-pin (dangling) nets.
+      - name: Check for dangling nets
+        run: node tools/check-dangling-nets.mjs
+
+      - name: Install tscircuit project deps
+        working-directory: output
+        run: npm install
+
+      - name: Type-check the board (tsc --noEmit)
+        working-directory: output
+        run: npx tsc --noEmit

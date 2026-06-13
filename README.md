@@ -28,11 +28,10 @@ The header comment of `output/index.circuit.tsx` is the authoritative changelog 
 
 `output/index.circuit.tsx` is the **v3.0 revision**. All the connectivity bugs inherited from the EasyEDA → tscircuit conversion have been fixed (TX driver chain, TPS5430 feedback divider, bootstrap cap, reverse-polarity D2, input filter C7), the `net.unnamed_*` placeholders are renamed, a bus TVS and per-chip U3 decoupling were added, and the three star-stitched GND islands are in place. `tsc --noEmit` passes. What remains before fabrication:
 
-### To verify / fix before fabrication
+### To verify before fabrication
 
-- **TVS1 standoff is too low for the bus.** The ABB-Welcome / Busch-Welcome 2-wire bus runs at **28 V ±2 V** (the system controller supplies 28 VDC), i.e. up to ~30 V at idle. `TVS1 = SMBJ24CA` has a 24 V standoff / 26.7 V min breakdown, so it would conduct continuously on a healthy bus, overheat, and eventually trip F2. Pick a standoff above the max bus voltage — **SMBJ30A** is the natural choice. TVS1 sits on `BUS_PWR`, *after* the reverse-polarity diode D2, so the rail is fixed-polarity DC and a **unidirectional** part (the `…A` suffix) is correct and clamps lower than the bidirectional `…CA`. Tradeoff to be aware of: a 30 V-standoff SMBJ clamps at ~48 V, which is above the TPS5430's 36 V abs-max VIN — so the TVS guards against large surges while L3's series impedance plus the buck's own 36 V headroom cover the 30–36 V band. If tighter VIN protection is needed, move the clamp ahead of L3 or use a higher-VIN buck.
-- **`circuit-json` / `tscircuit` pinned to `"latest"`** in `output/package.json` (and `latest` in the imports). Pin to specific versions before sending Gerbers so builds are reproducible (Gerbers/BOM must be deterministic).
 - **L2 = 100 µH output inductor** is high for a 500 kHz TPS5430 (the datasheet suggests ~10–22 µH). Inherited from the original design and presumably field-proven, but with the ~590 µF of bulk on `V3V3` the loop crossover is very low (sluggish transient response). Re-check against the datasheet if load-step response matters for the Wi-Fi current bursts.
+- **TVS1 clamp vs buck abs-max.** TVS1 (now `SMBJ30A`) clamps at ~48 V, above the TPS5430's 36 V abs-max VIN. L3's series impedance plus the buck's own 36 V headroom cover the 30–36 V band, but if you want tighter VIN protection, move the clamp ahead of L3 or use a higher-VIN buck.
 
 ### Optional hardening
 
@@ -46,13 +45,19 @@ The header comment of `output/index.circuit.tsx` is the authoritative changelog 
 - **R_TERM removed** — the DC-coupled 120 Ω across the bus rails would have burned (~4.8 W in a 0603); ABB-Welcome is a short-stub bus that doesn't need it.
 - **F2 polyfuse** modelled as `<fuse>` (was an invalid `<chip currentRating>` that broke `tsc`).
 - **SW1 silk** corrected to "RST" (it grounds EN, not GPIO0).
+- **TVS1 = SMBJ30A** (was SMBJ24CA, which would conduct on the 28 V bus). Unidirectional, cathode → `BUS_PWR`.
+- **`circuit-json` / `tscircuit` pinned** to exact versions in `output/package.json` (were `"latest"`).
 
-### Process improvements
+### Process tooling (in place)
 
-- **Add a connectivity sanity-check to `tools/`.** A small script that walks `circuit.json` (or `index.circuit.tsx`) and lists any net appearing in only one `connections` block would have caught every original dangling-net bug automatically. Could live as `tools/check-dangling-nets.mjs` under `npm run validate`.
-- **Add `tsc --noEmit` to a CI step** (GitHub Actions on push to `main`) so type errors in the imports/index can't sneak in.
+- **Dangling-net check** — `tools/check-dangling-nets.mjs` flags any net bound by a single pin in `output/index.circuit.tsx`. Run it with `npm run check` (or `npm run validate`, which runs it before the circuit-json schema check) from `tools/`.
+- **CI** — `.github/workflows/ci.yml` runs the dangling-net check and `tsc --noEmit` on every push / PR to `main`.
+
+### Still open (process)
+
 - **Snapshot the schematic + PCB SVG on each PR** (`tsci snapshot`) so reviewers can diff visuals, not just JSON/TSX.
 - **Per-chip `schPinArrangement`** in `output/imports/*.tsx` (especially `ESP32_S3_WROOM_1`) so the auto-generated schematic is readable when reviewing.
+- **Commit `output/package-lock.json`** (currently gitignored) for fully reproducible installs — pinning `package.json` constrains the top level but transitive deps still float without the lock.
 
 ## Repo layout
 
