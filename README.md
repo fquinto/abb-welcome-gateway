@@ -55,12 +55,12 @@ The header comment of `output/index.circuit.tsx` is the authoritative changelog 
 
 - **Dangling-net check** — `tools/check-dangling-nets.mjs` flags any net bound by a single pin in `output/index.circuit.tsx`. Run it with `npm run check` (or `npm run validate`, which runs it before the circuit-json schema check) from `tools/`.
 - **CI** — `.github/workflows/ci.yml` runs the dangling-net check and `tsc --noEmit` on every push / PR to `main`.
+- **Reproducible installs** — `output/package-lock.json` is tracked and CI uses `npm ci`, so the pinned `package.json` plus the lock give a deterministic dependency tree (transitive deps included).
 
 ### Still open (process)
 
-- **Snapshot the schematic + PCB SVG on each PR** (`tsci snapshot`) so reviewers can diff visuals, not just JSON/TSX.
+- **Snapshot the schematic + PCB SVG on each PR** (`npm run snapshot` → `tsci snapshot`) so reviewers can diff visuals, not just JSON/TSX. The npm scripts exist; generating baselines needs the platform-native `@resvg/resvg-js` binary, so run it on the dev machine (or a dedicated CI job that installs deps fresh) — not portable to commit from a mismatched platform.
 - **Per-chip `schPinArrangement`** in `output/imports/*.tsx` (especially `ESP32_S3_WROOM_1`) so the auto-generated schematic is readable when reviewing.
-- **Commit `output/package-lock.json`** (currently gitignored) for fully reproducible installs — pinning `package.json` constrains the top level but transitive deps still float without the lock.
 
 ## Repo layout
 
