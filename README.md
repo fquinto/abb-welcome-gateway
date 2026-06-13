@@ -56,11 +56,12 @@ The header comment of `output/index.circuit.tsx` is the authoritative changelog 
 - **Dangling-net check** — `tools/check-dangling-nets.mjs` flags any net bound by a single pin in `output/index.circuit.tsx`. Run it with `npm run check` (or `npm run validate`, which runs it before the circuit-json schema check) from `tools/`.
 - **CI** — `.github/workflows/ci.yml` runs the dangling-net check and `tsc --noEmit` on every push / PR to `main`.
 - **Reproducible installs** — `output/package-lock.json` is tracked and CI uses `npm ci`, so the pinned `package.json` plus the lock give a deterministic dependency tree (transitive deps included).
+- **Readable ESP32 schematic** — `ESP32_S3_WROOM_1` has a `schPinArrangement` that places only the 9 pins the board uses (power/EN on top, GND bottom, bus-side inputs left, driven outputs + UART/boot right) instead of a 61-pin wall. Verified via a headless `@tscircuit/eval` run (symbol drops from 61 to 9 ports). The other wrappers are small enough not to need it.
 
 ### Still open (process)
 
 - **Snapshot the schematic + PCB SVG on each PR** (`npm run snapshot` → `tsci snapshot`) so reviewers can diff visuals, not just JSON/TSX. The npm scripts exist; generating baselines needs the platform-native `@resvg/resvg-js` binary, so run it on the dev machine (or a dedicated CI job that installs deps fresh) — not portable to commit from a mismatched platform.
-- **Per-chip `schPinArrangement`** in `output/imports/*.tsx` (especially `ESP32_S3_WROOM_1`) so the auto-generated schematic is readable when reviewing.
+- **PCB autorouting** — a headless eval surfaced a `pcb_autorouting_error` (the capacity autorouter runs out of iterations on the full board). The parts are hand-placed but traces aren't; either hand-route in the PCB tool or constrain/route in tscircuit before relying on `tsci build` for fab output.
 
 ## Repo layout
 

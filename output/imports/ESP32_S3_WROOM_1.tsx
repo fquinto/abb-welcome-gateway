@@ -68,6 +68,18 @@ export const ESP32_S3_WROOM_1 = (props: ChipProps<typeof pinLabels>) => {
   return (
     <chip
       pinLabels={pinLabels}
+      // Readable schematic symbol: only the pins this board actually uses are
+      // placed, grouped by function. The remaining GPIOs / NC / extra GND pads
+      // still exist as ports for the PCB — they're just omitted from the
+      // schematic box so the symbol isn't a 61-pin wall. Power/control on top,
+      // GND on the bottom, bus-side inputs on the left, driven outputs +
+      // UART/boot on the right.
+      schPinArrangement={{
+        topSide: { direction: "left-to-right", pins: ["V3V3", "EN"] },
+        bottomSide: { direction: "left-to-right", pins: ["pin1"] },
+        leftSide: { direction: "top-to-bottom", pins: ["RXD0", "GPIO4"] },
+        rightSide: { direction: "top-to-bottom", pins: ["TXD0", "GPIO5", "GPIO2", "GPIO0"] },
+      }}
       supplierPartNumbers={{ jlcpcb: ["C5736265"] }}
       manufacturerPartNumber="ESP32-S3-WROOM-1-N16R8"
       footprint={<footprint>
