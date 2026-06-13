@@ -1,2 +1,8 @@
 .tmp/
 tools/node_modules/
+
+# tscircuit output project — build artefacts and local deps
+output/.tscircuit/
+output/dist/
+output/node_modules/
+output/package-lock.json
