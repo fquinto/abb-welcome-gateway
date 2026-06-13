@@ -61,7 +61,7 @@ The header comment of `output/index.circuit.tsx` is the authoritative changelog 
 ### Still open (process)
 
 - **Snapshot the schematic + PCB SVG on each PR** (`npm run snapshot` → `tsci snapshot`) so reviewers can diff visuals, not just JSON/TSX. The npm scripts exist; generating baselines needs the platform-native `@resvg/resvg-js` binary, so run it on the dev machine (or a dedicated CI job that installs deps fresh) — not portable to commit from a mismatched platform.
-- **PCB autorouting** — a headless eval surfaced a `pcb_autorouting_error` (the capacity autorouter runs out of iterations on the full board). The parts are hand-placed but traces aren't; either hand-route in the PCB tool or constrain/route in tscircuit before relying on `tsci build` for fab output.
+- **PCB routing happens in KiCad, not tscircuit.** tscircuit's autorouter does not converge on this board (capacity autorouter runs out of iterations even at `100x` effort) and produces no copper pours, which this design needs. The board is exported to `hardware/kicad-v3/` (footprints placed, nets assigned, no traces) — route it there. See `hardware/kicad-v3/README.md`.
 
 ## Repo layout
 
@@ -72,6 +72,7 @@ The header comment of `output/index.circuit.tsx` is the authoritative changelog 
 │   ├─ PCB_..._<date>.json               EasyEDA PCB layout
 │   ├─ BOM.csv, Schematic.net/.svg       EasyEDA sidecar exports
 │   └─ circuit.json                      intermediate (output of tools/convert.mjs)
+├─ hardware/kicad-v3/                    v3 exported to KiCad for routing (placed, unrouted)
 │
 ├─ tools/                               EasyEDA → circuit-json → tscircuit pipeline
 │   ├─ convert.mjs                      orchestrator (root JSONs → circuit.json)
