@@ -26,51 +26,31 @@ The header comment of `output/index.circuit.tsx` is the authoritative changelog 
 
 ## Status & known issues
 
-`output/index.circuit.tsx` is **work in progress, not fabrication-ready yet**. A walk through the netlist surfaced several connectivity bugs (mostly inherited from the EasyEDA → tscircuit conversion, which left a fan of `net.unnamed_*` placeholders) plus some hardening to do. The list below tracks what to fix before sending to fab, grouped by severity.
+`output/index.circuit.tsx` is the **v3.0 revision**. All the connectivity bugs inherited from the EasyEDA → tscircuit conversion have been fixed (TX driver chain, TPS5430 feedback divider, bootstrap cap, reverse-polarity D2, input filter C7), the `net.unnamed_*` placeholders are renamed, a bus TVS and per-chip U3 decoupling were added, and the three star-stitched GND islands are in place. `tsc --noEmit` passes. What remains before fabrication:
 
-### Must-fix before fabrication (real bugs)
+### To verify / fix before fabrication
 
-These are connectivity errors — components present in the schematic but not wired into a functional loop. They are easy to spot because the offending nets appear in only one `connections={…}` block in the whole file.
+- **TVS1 standoff is too low for the bus.** The ABB-Welcome / Busch-Welcome 2-wire bus runs at **28 V ±2 V** (the system controller supplies 28 VDC), i.e. up to ~30 V at idle. `TVS1 = SMBJ24CA` has a 24 V standoff / 26.7 V min breakdown, so it would conduct continuously on a healthy bus, overheat, and eventually trip F2. Pick a standoff above the max bus voltage — **SMBJ30A** is the natural choice. TVS1 sits on `BUS_PWR`, *after* the reverse-polarity diode D2, so the rail is fixed-polarity DC and a **unidirectional** part (the `…A` suffix) is correct and clamps lower than the bidirectional `…CA`. Tradeoff to be aware of: a 30 V-standoff SMBJ clamps at ~48 V, which is above the TPS5430's 36 V abs-max VIN — so the TVS guards against large surges while L3's series impedance plus the buck's own 36 V headroom cover the 30–36 V band. If tighter VIN protection is needed, move the clamp ahead of L3 or use a higher-VIN buck.
+- **`circuit-json` / `tscircuit` pinned to `"latest"`** in `output/package.json` (and `latest` in the imports). Pin to specific versions before sending Gerbers so builds are reproducible (Gerbers/BOM must be deterministic).
+- **L2 = 100 µH output inductor** is high for a 500 kHz TPS5430 (the datasheet suggests ~10–22 µH). Inherited from the original design and presumably field-proven, but with the ~590 µF of bulk on `V3V3` the loop crossover is very low (sluggish transient response). Re-check against the datasheet if load-step response matters for the Wi-Fi current bursts.
 
-- **TX driver chain is fully disconnected.** R12 / R13 / R14 / R15 (820 Ω, 2512, intended as the bus TX drivers), MOSFETs Q4 / Q5, and series resistor R7 form an island of `net.unnamed_2 / _18 / _19 / _11 / _64` nodes plus `net.Q4_1 / Q4_3 / D2_2 / BUS_TX` that **never connect to anything else**. Concretely:
-  - `Q4_1` ties Q4 and Q5 gates together but has no driver (the ESP32's `BUS_TX_PIN` reaches R7 and then dies on `unnamed_11`).
-  - Q4 drain (`Q4_3`), Q5 drain (`D2_2`) and D5 cathode (`BUS_TX`) are all single-occurrence nets.
-  - The four 820 Ω resistors form an isolated R12/R14/R15 ↔ R13 mesh.
-  → As wired, the device **cannot transmit on the bus**. The TX topology needs to be re-derived from the original EasyEDA schematic and all `unnamed_*` nodes renamed to meaningful names (`TX_DRIVE_HI`, `TX_DRIVE_LO`, `BUS_TX_DRAIN`, …).
-- **TPS5430 feedback divider is broken.** U1.VSENSE = `U1_4`; R19 sits between `unnamed_24` and `U1_4`; R18 sits between `PGND` and `unnamed_24`. There is **no resistor from `V3V3` to `U1_4`** — the top leg of the divider is missing. The buck will not regulate to the intended 3.3 V (VSENSE just sees PGND through R18+R19).
-- **TPS5430 EN is floating** on `net.unnamed_31` (single occurrence). The part has a weak internal pull-up so it may still start, but EN must be tied to VIN through a pull-up (or directly) for a reliable cold-start.
-- **TPS5430 bootstrap cap is on the wrong pin.** C1 (10 nF) is wired BOOT ↔ `U1_1` (= U1.NC). The TPS5430DDA bootstrap cap belongs between **BOOT (pin 1) and PH (pin 6/7)**, not NC. As wired, the high-side gate drive has no boot capacitor; the part may not switch reliably.
-- **R7 (75 Ω, series in TX path) one terminal dangling** on `unnamed_11`.
-- **C7 (2.2 µF, 1206, intended buck input/output filter) one terminal dangling** on `unnamed_27`. C7 is essentially a no-op until it's tied to a real rail (most likely `BUS_PWR`, matching C8 next to it).
-- **D2 (SS24 schottky, snubber/protection) one terminal dangling** on `unnamed_12`. The other side is on `L3 → BUS_PWR` but the anode goes nowhere, so the diode is electrically a single-pin component.
-- **R_TERM (120 Ω, 0603) is wired straight across `BUS_PWR` ↔ `BUS_GND`** through the solder jumper. The ABB-Welcome bus carries DC power and AC signal on the same pair, so:
-  - At a ~24 V bus voltage, when the jumper is closed R_TERM continuously dissipates `24² / 120 ≈ 4.8 W` — a 0603 is rated for ~0.1 W; **it will burn**.
-  - A real bus termination must be **AC-coupled** (R_TERM in series with a DC-blocking cap, e.g. 10–100 nF). Either add the series cap, or repurpose this as something else, or remove it. Whatever the choice, R_TERM should also move to ≥ 0805 with a sensible power rating once the topology is fixed.
-- **SW1 silkscreen says "BOOT" but the circuit is a RESET button.** SW1 grounds the EN node (via R11 150 Ω), not GPIO0. Either relabel the silk to "RST" or rewire SW1 to GPIO0 (`net.D0`) and add a real RESET button on EN if both are wanted.
+### Optional hardening
 
-### Likely-fix / hardening
+- **C_DCP1 = 22 µF in 0805** — DC-bias derating on a small 22 µF / 6.3 V part is heavy. Consider 1206 at a higher voltage rating, or 2 × 10 µF 0805 in parallel.
+- **No dedicated ESP32 BOOT button.** GPIO0 is only driven by Q3 (FTDI auto-program). A `BOOT` tactile to ground on GPIO0 helps when the auto-program sequence ever fails.
 
-- **No decoupling on U3 (74LVC1G14).** Add a 100 nF 0603 between U3.VCC (`V3V3_ESP`) and U3.GND (`DGND`), placed within a few mm of pin 5.
-- **No TVS on the bus input.** Schottkies D6/D7 protect against reverse polarity but not surges. Add a TVS (e.g. SMBJ24CA, or PESDxL2BT for low-cap) across `BUS_PWR` / `BUS_GND` before the bulk cap C23.
-- **`circuit-json` and `tscircuit` pinned to `"latest"`** in `output/package.json`. Pin to specific versions for reproducible builds (Gerbers/BOM must be deterministic).
-- **Silkscreen reads `v2.1`** while this is meant to be the improved revision. Bump to `v3.0` (or whatever the next fab tag is) once the bugs above are fixed.
-- **LED3 cathode is pulled to `BUS_GND` via Q6,** not `DGND` like the other LEDs. That contradicts the comment "cathodes on DGND so the Wi-Fi current doesn't blink them". Either move the LED return to `DGND` and switch with the high-side, or update the comment to document the deliberate cross-island return.
-- **C_DCP1 = 22 µF in 0805.** Possible, but DC-bias derating on small 22 µF/6.3 V parts is heavy. Consider 1206 + a higher rated voltage, or 2 × 10 µF 0805 in parallel.
-- **Q2 / Q3 base resistors (R8, R9 = 100 kΩ) for the DTR/RTS auto-program circuit are on the high side.** Common designs use 1 k – 10 kΩ. Verify the auto-program timing with the actual FTDI driver.
-- **ESP32 BOOT button is missing.** GPIO0 is only driven by Q3 (FTDI auto-program). A dedicated `BOOT` tactile to ground for GPIO0 is useful for manual firmware uploads if the auto-program ever fails.
+### Fixed in v3.0 (was flagged in v2.x)
 
-### Net-naming hygiene (mechanical, but the bugs above mostly hide here)
-
-The conversion left a lot of placeholder net names that obscure what's connected to what. They should be renamed to meaningful labels, and renaming them is exactly the exercise that reveals the dangling nets above.
-
-- All `net.unnamed_<n>` should disappear (they are: 2, 8, 11, 12, 18, 19, 22, 24, 27, 31, 64).
-- Internal aliases like `Q4_1`, `Q4_3`, `D2_2`, `Q1_1`, `R3_2`, `R6_1`, `LED1_2`, `LED2_2`, `LED3_1`, `LED3_2`, `U1_1`, `U1_4`, `U1_8`, `SW1_2` should get descriptive names tied to function (e.g. `TX_GATE`, `BIAS`, `RX_LED_K`, `STAT_LED_A`, `FB_DIV`, `BOOT_CAP`, `SW_NODE`).
-- The header comment claims `GND` is a "convenience alias (legacy components still bind to this)". In practice nothing binds to `net.GND` anymore except the three star-point 0 Ω resistors (R_PGND, R_DGND, R_BGND) — so `GND` is purely the star-point node now. Update the policy comment.
+- **RX front-end overvoltage** — the 74LVC1G14 Schmitt input and Q1's collector now sit on `BUS_RX_DET` (a clean 0–3.3 V node pulled up to `V3V3_ESP` by R2), no longer on the ~bus-voltage `BUS_RX_A`. This keeps the logic input within its VCC+0.5 V abs-max; previously it was tied through D4 to the bus.
+- **TX driver / feedback divider / bootstrap / D2 / C7** all wired into real nets (were dangling `net.unnamed_*` islands).
+- **R_TERM removed** — the DC-coupled 120 Ω across the bus rails would have burned (~4.8 W in a 0603); ABB-Welcome is a short-stub bus that doesn't need it.
+- **F2 polyfuse** modelled as `<fuse>` (was an invalid `<chip currentRating>` that broke `tsc`).
+- **SW1 silk** corrected to "RST" (it grounds EN, not GPIO0).
 
 ### Process improvements
 
-- **Add a connectivity sanity-check to `tools/`.** A small script that walks `circuit.json` (or the emitted `index.circuit.tsx`) and lists any net that appears in only one `connections` block would have caught every must-fix bug above automatically. Could live as `tools/check-dangling-nets.mjs` and run from `npm run validate`.
-- **Add `tsc --noEmit` to a CI step** (GitHub Actions on push to `main`), so type errors in the imports/index can't sneak in.
+- **Add a connectivity sanity-check to `tools/`.** A small script that walks `circuit.json` (or `index.circuit.tsx`) and lists any net appearing in only one `connections` block would have caught every original dangling-net bug automatically. Could live as `tools/check-dangling-nets.mjs` under `npm run validate`.
+- **Add `tsc --noEmit` to a CI step** (GitHub Actions on push to `main`) so type errors in the imports/index can't sneak in.
 - **Snapshot the schematic + PCB SVG on each PR** (`tsci snapshot`) so reviewers can diff visuals, not just JSON/TSX.
 - **Per-chip `schPinArrangement`** in `output/imports/*.tsx` (especially `ESP32_S3_WROOM_1`) so the auto-generated schematic is readable when reviewing.
 
