@@ -165,13 +165,19 @@ export default () => (
       variant="schottky" pcbX="7.202mm" pcbY="-8.314mm" pcbRotation={180}
       connections={{ pin1: "net.BUS_HOT_F", pin2: "net.BUS_DC_RAW" }} />
 
-    {/* === TVS1 — bidirectional surge clamp across the bus power rail.
-         Placed parallel to C23 / U1.VIN so transients are caught before
-         they reach the buck input. After F2 so a sustained surge that takes
-         out the TVS still trips the polyfuse. === */}
-    <diode name="TVS1" footprint="smb" manufacturerPartNumber="SMBJ24CA" supplierPartNumbers={{ jlcpcb: ["C181370"] }}
+    {/* === TVS1 — unidirectional surge clamp across the bus power rail.
+         The ABB-Welcome / Busch-Welcome bus runs at 28 V ±2 V, so a 30 V-
+         standoff part stays off at idle (the previous SMBJ24CA would have
+         conducted continuously and tripped F2). BUS_PWR is post-D2 fixed-
+         polarity DC, so a unidirectional SMBJ30A is correct and clamps lower
+         than the bidirectional CA — cathode (pin2) → BUS_PWR, anode → BUS_GND.
+         Placed parallel to C23 / U1.VIN, after F2 so a sustained surge that
+         takes out the TVS still trips the polyfuse. Note: clamps at ~48 V,
+         above the TPS5430's 36 V abs-max VIN — L3 + the buck's own headroom
+         cover the 30–36 V band; the TVS guards against the large surges. === */}
+    <diode name="TVS1" footprint="smb" manufacturerPartNumber="SMBJ30A" supplierPartNumbers={{ jlcpcb: ["C699005"] }}
       variant="tvs" pcbX="10mm" pcbY="-11mm" pcbRotation={90}
-      connections={{ pin1: "net.BUS_PWR", pin2: "net.BUS_GND" }} />
+      connections={{ pin1: "net.BUS_GND", pin2: "net.BUS_PWR" }} />
 
     {/* === Bus-input bulk capacitor (C23, on BUS_PWR / BUS_GND) === */}
     <chip name="C23" manufacturerPartNumber="VEJ101M1HTR-0810" supplierPartNumbers={{ jlcpcb: ["C176665"] }}

@@ -7,7 +7,8 @@
   "scripts": {
     "convert": "node convert.mjs",
     "cache": "node convert.mjs --only-cache",
-    "validate": "node validate.mjs"
+    "check": "node check-dangling-nets.mjs",
+    "validate": "node check-dangling-nets.mjs && node validate.mjs"
   },
   "dependencies": {
     "circuit-json": "*",
