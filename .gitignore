@@ -5,4 +5,4 @@ tools/node_modules/
 output/.tscircuit/
 output/dist/
 output/node_modules/
-output/package-lock.json
+# package-lock.json is tracked for reproducible installs (pinned deps)

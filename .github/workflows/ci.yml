@@ -23,7 +23,7 @@ jobs:
 
       - name: Install tscircuit project deps
         working-directory: output
-        run: npm install
+        run: npm ci
 
       - name: Type-check the board (tsc --noEmit)
         working-directory: output
