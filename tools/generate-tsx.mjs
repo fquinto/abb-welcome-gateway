@@ -22,6 +22,8 @@ import { parseBom, tscircuitValueFromBomName } from "./lib/bom-parser.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..");
+// EasyEDA v2 source files live under hardware/easyeda-v2/.
+const SRC_DIR = path.join(REPO_ROOT, "hardware", "easyeda-v2");
 const SCH_FILE = "Bus_Interface_for_ABB-Welcome_v2_EasyEDA_Schematic.json";
 const PCB_FILE = "PCB_Bus_Interface_for_ABB-Welcome_v2_EasyEDA_PCB_2026-05-06.json";
 const NET_FILE = "Schematic.net";
@@ -104,15 +106,15 @@ function pcbRotation(deg) {
 }
 
 function main() {
-    const schDoc = readJson(path.join(REPO_ROOT, SCH_FILE));
-    const pcbDoc = readJson(path.join(REPO_ROOT, PCB_FILE));
+    const schDoc = readJson(path.join(SRC_DIR, SCH_FILE));
+    const pcbDoc = readJson(path.join(SRC_DIR, PCB_FILE));
     const sch = parseSchematicShapes(schDoc.schematics[0].dataStr.shape);
     const pcb = parsePcbShapes(pcbDoc.shape);
     const shift = pcbOriginShift(pcb);
 
     // Optional: PADS-PCB netlist as the canonical net-name source.
     let netlist = null;
-    const netPath = path.join(REPO_ROOT, NET_FILE);
+    const netPath = path.join(SRC_DIR, NET_FILE);
     if (fs.existsSync(netPath)) {
         netlist = parsePadsNetlist(netPath);
         console.log(`Netlist: ${netlist.pinsByNet.size} signals, ${netlist.netByPin.size} pin↔net entries.`);
@@ -120,7 +122,7 @@ function main() {
 
     // Optional: BOM.csv as the canonical value source (overrides MPN parsing).
     let bom = null;
-    const bomPath = path.join(REPO_ROOT, BOM_FILE);
+    const bomPath = path.join(SRC_DIR, BOM_FILE);
     if (fs.existsSync(bomPath)) {
         bom = parseBom(bomPath);
         console.log(`BOM: ${bom.size} designator entries.`);
@@ -285,7 +287,7 @@ ${lines.join("\n")}
 </html>
 `;
 
-    fs.writeFileSync(path.join(REPO_ROOT, OUT_FILE), html);
+    fs.writeFileSync(path.join(SRC_DIR, OUT_FILE), html);
     console.log(`Wrote ${OUT_FILE}: ${lines.length} JSX elements`);
     if (chipsWithUnknownPins) console.log(`Chips with default soic8 footprint: ${chipsWithUnknownPins}`);
     console.log(`Net labels referenced: ${NETLABEL_NAMES.size} (${[...NETLABEL_NAMES].sort().join(", ")})`);

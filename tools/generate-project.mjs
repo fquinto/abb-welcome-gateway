@@ -22,6 +22,8 @@ import { generateChipImport } from "./lib/chip-import-generator.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..");
+// EasyEDA v2 source files live under hardware/easyeda-v2/.
+const SRC_DIR = path.join(REPO_ROOT, "hardware", "easyeda-v2");
 const SCH_FILE = "Bus_Interface_for_ABB-Welcome_v2_EasyEDA_Schematic.json";
 const PCB_FILE = "PCB_Bus_Interface_for_ABB-Welcome_v2_EasyEDA_PCB_2026-05-06.json";
 const NET_FILE = "Schematic.net";
@@ -114,19 +116,19 @@ function writeImports() {
 }
 
 async function main() {
-    const schDoc = readJson(path.join(REPO_ROOT, SCH_FILE));
-    const pcbDoc = readJson(path.join(REPO_ROOT, PCB_FILE));
+    const schDoc = readJson(path.join(SRC_DIR, SCH_FILE));
+    const pcbDoc = readJson(path.join(SRC_DIR, PCB_FILE));
     const sch = parseSchematicShapes(schDoc.schematics[0].dataStr.shape);
     const pcb = parsePcbShapes(pcbDoc.shape);
     const shift = pcbOriginShift(pcb);
 
     let netlist = null;
-    if (fs.existsSync(path.join(REPO_ROOT, NET_FILE))) {
-        netlist = parsePadsNetlist(path.join(REPO_ROOT, NET_FILE));
+    if (fs.existsSync(path.join(SRC_DIR, NET_FILE))) {
+        netlist = parsePadsNetlist(path.join(SRC_DIR, NET_FILE));
     }
     let bom = null;
-    if (fs.existsSync(path.join(REPO_ROOT, BOM_FILE))) {
-        bom = parseBom(path.join(REPO_ROOT, BOM_FILE));
+    if (fs.existsSync(path.join(SRC_DIR, BOM_FILE))) {
+        bom = parseBom(path.join(SRC_DIR, BOM_FILE));
     }
 
     // 1) Per-chip imports

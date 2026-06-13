@@ -12,7 +12,7 @@ function svgToPng(svg, scale = 2) {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..");
-const file = path.join(REPO_ROOT, "circuit.json");
+const file = path.join(REPO_ROOT, "hardware", "easyeda-v2", "circuit.json");
 const json = JSON.parse(fs.readFileSync(file, "utf8"));
 
 const outDir = path.join(REPO_ROOT, ".tmp");

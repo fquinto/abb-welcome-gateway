@@ -6,7 +6,7 @@ The board taps the doorbell bus, isolates and filters it, and level-translates T
 
 ## Project goal
 
-The original v2 design is the EasyEDA hardware in the repo root (derived from work by `mat931`, CERN-OHL-W v2). **This repo's goal is to evolve that initial design** — fixing EOL parts, hardening the bus front-end and improving signal integrity — and converge on a single, fabrication-ready source.
+The original v2 design is the EasyEDA hardware in `hardware/easyeda-v2/` (derived from work by `mat931`, CERN-OHL-W v2). **This repo's goal is to evolve that initial design** — fixing EOL parts, hardening the bus front-end and improving signal integrity — and converge on a single, fabrication-ready source.
 
 The **final product is `output/index.circuit.tsx`** — a tscircuit (React/TSX) description of the improved board, from which Gerbers / BOM / PnP and 3D models are exported via the `tsci` CLI.
 
@@ -78,10 +78,11 @@ The conversion left a lot of placeholder net names that obscure what's connected
 
 ```
 .
-├─ Bus_Interface_..._Schematic.json     EasyEDA schematic (original v2 source)
-├─ PCB_..._<date>.json                  EasyEDA PCB layout
-├─ BOM.csv, Schematic.net/.svg          EasyEDA sidecar exports
-├─ circuit.json                         intermediate (output of tools/convert.mjs)
+├─ hardware/easyeda-v2/                  original v2 EasyEDA source + exports
+│   ├─ Bus_Interface_..._Schematic.json  EasyEDA schematic (original v2 source)
+│   ├─ PCB_..._<date>.json               EasyEDA PCB layout
+│   ├─ BOM.csv, Schematic.net/.svg       EasyEDA sidecar exports
+│   └─ circuit.json                      intermediate (output of tools/convert.mjs)
 │
 ├─ tools/                               EasyEDA → circuit-json → tscircuit pipeline
 │   ├─ convert.mjs                      orchestrator (root JSONs → circuit.json)
@@ -122,7 +123,7 @@ When the EasyEDA source changes (or to refresh `circuit.json`):
 ```bash
 cd tools
 npm install
-npm run convert       # writes circuit.json at repo root
+npm run convert       # writes hardware/easyeda-v2/circuit.json
 npm run validate      # sanity-checks the output
 ```
 
@@ -134,7 +135,7 @@ node tools/generate-import.mjs <ComponentName> <LCSC> <ManufacturerPartNumber>
 
 ### Editing the EasyEDA source directly
 
-Open the root `*.json` files in EasyEDA (web or Pro). Don't hand-edit the JSON unless making a very targeted change — the format is positional and easy to corrupt. Gerbers / BOM / PnP for the legacy v2 design are exported from inside EasyEDA.
+Open the `hardware/easyeda-v2/*.json` files in EasyEDA (web or Pro). Don't hand-edit the JSON unless making a very targeted change — the format is positional and easy to corrupt. Gerbers / BOM / PnP for the legacy v2 design are exported from inside EasyEDA.
 
 ## Credits & license
 

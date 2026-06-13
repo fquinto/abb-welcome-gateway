@@ -11,7 +11,7 @@ const REPO_ROOT = path.resolve(__dirname, "..");
 const designator = process.argv[2] || "P1";
 const radius = Number(process.argv[3] ?? 8);
 
-const json = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, "circuit.json"), "utf8"));
+const json = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, "hardware", "easyeda-v2", "circuit.json"), "utf8"));
 const sourceByName = new Map();
 for (const el of json) if (el.type === "source_component") sourceByName.set(el.name, el);
 const target = sourceByName.get(designator);

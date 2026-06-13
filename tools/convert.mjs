@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Top-level orchestrator. Reads the EasyEDA schematic + PCB JSON files in the
-// repo root and emits `circuit.json` next to them.
+// Top-level orchestrator. Reads the EasyEDA schematic + PCB JSON files in
+// hardware/easyeda-v2/ and emits `circuit.json` next to them.
 //
 // v0 scope: emits source_component + pcb_component placements. No
 // schematic_*, no pcb_trace yet — those land in subsequent passes once the
@@ -31,6 +31,8 @@ import { getSilkOffset, getCadOffset } from "./lib/footprint-rotation-offsets.mj
 import { pickFootprinter } from "./lib/footprinter-map.mjs";
 import { getBodySize } from "./lib/component-body-sizes.mjs";
 
+// EasyEDA v2 source + the generated circuit.json all live under hardware/easyeda-v2/.
+const SRC_DIR = path.join(REPO_ROOT, "hardware", "easyeda-v2");
 const SCH_FILE = "Bus_Interface_for_ABB-Welcome_v2_EasyEDA_Schematic.json";
 const PCB_FILE = "PCB_Bus_Interface_for_ABB-Welcome_v2_EasyEDA_PCB_2026-05-06.json";
 const OUT_FILE = "circuit.json";
@@ -194,8 +196,8 @@ function transformChildren(pcbEls, center, padsRot, silkRot, cadRot) {
 }
 
 async function main() {
-    const schDoc = readJson(path.join(REPO_ROOT, SCH_FILE));
-    const pcbDoc = readJson(path.join(REPO_ROOT, PCB_FILE));
+    const schDoc = readJson(path.join(SRC_DIR, SCH_FILE));
+    const pcbDoc = readJson(path.join(SRC_DIR, PCB_FILE));
     const { schShapes, pcbShapes } = pickShapes(schDoc, pcbDoc);
 
     const sch = parseSchematicShapes(schShapes);
@@ -381,7 +383,7 @@ async function main() {
         }
     }
 
-    fs.writeFileSync(path.join(REPO_ROOT, OUT_FILE), JSON.stringify(out, null, 2));
+    fs.writeFileSync(path.join(SRC_DIR, OUT_FILE), JSON.stringify(out, null, 2));
     console.log(`\nWrote ${OUT_FILE} with ${out.length} elements.`);
 }
 
