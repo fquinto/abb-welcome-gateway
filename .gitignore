@@ -6,3 +6,8 @@ output/.tscircuit/
 output/dist/
 output/node_modules/
 # package-lock.json is tracked for reproducible installs (pinned deps)
+
+# KiCad local-only files (backups, per-user prefs, footprint cache)
+hardware/kicad-v3/*-backups/
+hardware/kicad-v3/*.kicad_prl
+hardware/kicad-v3/fp-info-cache
