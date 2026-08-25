@@ -61,7 +61,7 @@ The header comment of `output/index.circuit.tsx` is the authoritative changelog 
 ### Still open (process)
 
 - **Snapshot the schematic + PCB SVG on each PR** (`npm run snapshot` → `tsci snapshot`) so reviewers can diff visuals, not just JSON/TSX. The npm scripts exist; generating baselines needs the platform-native `@resvg/resvg-js` binary, so run it on the dev machine (or a dedicated CI job that installs deps fresh) — not portable to commit from a mismatched platform.
-- **PCB routing happens in KiCad, not tscircuit.** tscircuit's autorouter does not converge on this board (capacity autorouter runs out of iterations even at `100x` effort) and produces no copper pours, which this design needs. The board is exported to `hardware/kicad-v3/` (footprints placed, nets assigned, no traces) — route it there. See `hardware/kicad-v3/README.md`.
+- **PCB routing lives in KiCad** (`hardware/kicad-v3/`) and is **complete**: reglas y net classes (clearance HV para el bus de 28 V), las tres islas de GND como pours en B.Cu con star point, y ruteo total con DRC limpio y ratsnest a cero. El proyecto KiCad es ahora la fuente de verdad del PCB; las divergencias fisicas respecto a `output/index.circuit.tsx` (footprint real del ESP32-S3-WROOM-1, **LED de estado en GPIO6 en vez de GPIO2**, placa a 56.4 mm de alto, recolocaciones) estan documentadas en `hardware/kicad-v3/README.md`.
 
 ## Repo layout
 
