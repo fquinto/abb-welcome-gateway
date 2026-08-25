@@ -508,13 +508,13 @@
 		(uuid "07f27480-5e2c-01e1-4b9a-70be0a9f1ca3")
 		(at 93.6 129.199999)
 		(property "Reference" "C2"
-			(at 0 1.775 0)
+			(at 0 -1.649999 0)
 			(layer "F.SilkS")
 			(uuid "e2c265f4-cad7-4fcd-bd80-0537d27dcb65")
 			(effects
 				(font
-					(size 0.7 0.7)
-					(thickness 0.12)
+					(size 0.6 0.6)
+					(thickness 0.1)
 				)
 			)
 		)
@@ -738,13 +738,13 @@
 		(uuid "0992278c-540c-9af4-4e54-a28c0f4a1ff4")
 		(at 88.6 129.3 180)
 		(property "Reference" "C4"
-			(at 0 -1.775 180)
+			(at 0 1.55 0)
 			(layer "F.SilkS")
 			(uuid "93fa54a6-cd2e-420b-8c8e-0cc0da044227")
 			(effects
 				(font
-					(size 0.7 0.7)
-					(thickness 0.12)
+					(size 0.6 0.6)
+					(thickness 0.1)
 				)
 			)
 		)
@@ -968,13 +968,13 @@
 		(uuid "0b029ee6-5d6d-5f1a-3a22-a2e62e4d5b1a")
 		(at 120.6 111.25 -90)
 		(property "Reference" "F2"
-			(at 0 -1.775 270)
+			(at 0 1.7 90)
 			(layer "F.SilkS")
 			(uuid "6f24d0ca-4072-4efb-9e32-34073cd6e128")
 			(effects
 				(font
-					(size 0.7 0.7)
-					(thickness 0.12)
+					(size 0.6 0.6)
+					(thickness 0.1)
 				)
 			)
 		)
@@ -1439,13 +1439,13 @@
 		(uuid "137da72c-4a21-1b54-5840-222c055ea054")
 		(at 85.15 82.03)
 		(property "Reference" "C5"
-			(at 0 -1.375 0)
+			(at 0 1.27 0)
 			(layer "F.SilkS")
 			(uuid "5599120f-5f50-4286-84ee-9120e8d2f3e1")
 			(effects
 				(font
-					(size 0.7 0.7)
-					(thickness 0.12)
+					(size 0.6 0.6)
+					(thickness 0.1)
 				)
 			)
 		)
@@ -3089,13 +3089,13 @@
 		(uuid "2f788810-72e8-b570-1549-f2f04854cf90")
 		(at 81.95 82.03)
 		(property "Reference" "R11"
-			(at 0 -1.375 0)
+			(at 0 1.27 0)
 			(layer "F.SilkS")
 			(uuid "1716aa56-5e0f-4f7b-a091-c38f3a3d101d")
 			(effects
 				(font
-					(size 0.7 0.7)
-					(thickness 0.12)
+					(size 0.6 0.6)
+					(thickness 0.1)
 				)
 			)
 		)
@@ -3803,13 +3803,13 @@
 		(uuid "3f852602-01d7-b85e-4334-96be7b6e8ae2")
 		(at 88.25 81.9)
 		(property "Reference" "R10"
-			(at 0 -1.375 0)
+			(at 0 -2 0)
 			(layer "F.SilkS")
 			(uuid "102281a6-4459-4631-9518-c5577d17134e")
 			(effects
 				(font
-					(size 0.7 0.7)
-					(thickness 0.12)
+					(size 0.6 0.6)
+					(thickness 0.1)
 				)
 			)
 		)
@@ -4349,13 +4349,13 @@
 		(uuid "43e13ca0-1258-50c1-6891-de224134947d")
 		(at 116.73 89.55 90)
 		(property "Reference" "Q3"
-			(at 0 5 90)
+			(at 2.25 0 0)
 			(layer "F.SilkS")
 			(uuid "b1576b6b-54c5-456b-9997-421b6776a738")
 			(effects
 				(font
-					(size 0.7 0.7)
-					(thickness 0.12)
+					(size 0.6 0.6)
+					(thickness 0.1)
 				)
 			)
 		)
@@ -4508,13 +4508,13 @@
 		(uuid "46dc2d2a-3a73-ab4a-2e0b-296a21a2a78a")
 		(at 114.9 129.3 -90)
 		(property "Reference" "R_BGND"
-			(at 0 -1.375 270)
+			(at -2.7 0.35 90)
 			(layer "F.SilkS")
 			(uuid "195ed567-aba6-408d-b0bf-0ac9b0700f5f")
 			(effects
 				(font
-					(size 0.7 0.7)
-					(thickness 0.12)
+					(size 0.5 0.5)
+					(thickness 0.1)
 				)
 			)
 		)
@@ -6250,13 +6250,13 @@
 		(uuid "64e88a80-0a78-4c9f-4ff7-f1425597d0dd")
 		(at 112.9 129.3 -90)
 		(property "Reference" "R_PGND"
-			(at 0 -1.375 270)
+			(at -2.7 0.35 90)
 			(layer "F.SilkS")
 			(uuid "0982ecd7-8681-456e-90a6-605bcb71c645")
 			(effects
 				(font
-					(size 0.7 0.7)
-					(thickness 0.12)
+					(size 0.5 0.5)
+					(thickness 0.1)
 				)
 			)
 		)
@@ -7654,13 +7654,13 @@
 		(uuid "7c4cd0e4-1802-bcdc-53ad-b56440a1d85c")
 		(at 116.9 129.3 -90)
 		(property "Reference" "R_DGND"
-			(at 0 -1.375 270)
+			(at -2.7 0.35 90)
 			(layer "F.SilkS")
 			(uuid "47e85164-f266-4682-9f1e-0fe55443ddf0")
 			(effects
 				(font
-					(size 0.7 0.7)
-					(thickness 0.12)
+					(size 0.5 0.5)
+					(thickness 0.1)
 				)
 			)
 		)
@@ -8134,13 +8134,13 @@
 		(uuid "7fd38f60-29f2-e33f-2c46-aa227d7fc87d")
 		(at 100 130.05 180)
 		(property "Reference" "C1"
-			(at 0 -1.375 180)
+			(at 0 1.7 0)
 			(layer "F.SilkS")
 			(uuid "bb7e7b66-59fc-4b15-85df-95f8005ed23b")
 			(effects
 				(font
-					(size 0.7 0.7)
-					(thickness 0.12)
+					(size 0.6 0.6)
+					(thickness 0.1)
 				)
 			)
 		)
@@ -9282,6 +9282,30 @@
 			(font
 				(size 1.5 1.5)
 				(thickness 0.25)
+			)
+			(justify mirror)
+		)
+	)
+	(gr_text "nov-2026"
+		(at 100 114.3 0)
+		(layer "B.SilkS")
+		(uuid "97f7ba2c-931f-4cd4-a93c-a82556e73eee")
+		(effects
+			(font
+				(size 1.1 1.1)
+				(thickness 0.2)
+			)
+			(justify mirror)
+		)
+	)
+	(gr_text "github.com/fquinto"
+		(at 100 112 0)
+		(layer "B.SilkS")
+		(uuid "b18183e8-e227-4af0-9968-0d00a50e2019")
+		(effects
+			(font
+				(size 1.1 1.1)
+				(thickness 0.2)
 			)
 			(justify mirror)
 		)
