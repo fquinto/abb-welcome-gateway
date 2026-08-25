@@ -11,3 +11,7 @@ legacy/tscircuit/node_modules/
 hardware/kicad-v3/*-backups/
 hardware/kicad-v3/*.kicad_prl
 hardware/kicad-v3/fp-info-cache
+
+# firmware local files
+firmware/esphome/secrets.yaml
+firmware/esphome/.esphome/

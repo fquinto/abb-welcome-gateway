@@ -1,0 +1,56 @@
+# ABB-Welcome / Busch-Welcome gateway — ESPHome configuration.
+#
+# Pin mapping (board v3.0):
+#   GPIO4  bus RX (Schmitt-buffered digital input)
+#   GPIO5  bus TX (open-drain driver chain)
+#   GPIO6  status LED
+#   GPIO0  boot strap (driven by the FTDI auto-program circuit, do not use)
+
+esphome:
+  name: abb-welcome-gateway
+  friendly_name: ABB-Welcome Gateway
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: esp-idf
+
+external_components:
+  - source:
+      type: local
+      path: components
+
+logger:
+
+api:
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "ABB-Welcome Gateway"
+
+captive_portal:
+
+status_led:
+  pin:
+    number: GPIO6
+    inverted: false
+
+abb_welcome:
+  id: bus
+  rx_pin: GPIO4
+  tx_pin: GPIO5
+  address: 0x00  # door station address, see docs/user-guide.md
+
+binary_sensor:
+  - platform: abb_welcome
+    name: "Doorbell"
+
+button:
+  - platform: abb_welcome
+    name: "Open Door"
