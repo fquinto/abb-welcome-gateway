@@ -11,9 +11,11 @@ See [STATUS.md](STATUS.md) for the current state of each area.
       move to the datasheet recipe (~15 µH + 100–220 µF). If keeping 100 µH,
       plan a bench load-step measurement on the first prototype.
 - [ ] Optional: upsize `C_DCP1` (22 µF 0805 → 1206 or 2 × 10 µF).
-- [ ] Export fabrication outputs from KiCad: Gerbers + drill, BOM (with LCSC
-      part numbers), and pick-and-place. Add them under `hardware/kicad-v3/fab/`.
-- [ ] Order prototypes (JLCPCB/PCBWay, 2-layer, 1 oz).
+- [x] Export fabrication outputs from KiCad: Gerbers + drill, BOM and
+      pick-and-place under `hardware/kicad-v3/fab/`.
+- [ ] Fill the LCSC column for the generic passives / header in the BOM (basic
+      parts, left blank to avoid guessing — see `fab/README.md`).
+- [ ] Order prototypes (JLCPCB/PCBWay, 2-layer, 1 oz, ENIG).
 
 ## Firmware
 
