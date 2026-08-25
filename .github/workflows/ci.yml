@@ -7,24 +7,51 @@ on:
     branches: [main]
 
 jobs:
-  board:
-    name: Type-check board & check nets
+  pcb-drc:
+    name: PCB design rule check
+    runs-on: ubuntu-latest
+    container:
+      image: kicad/kicad:9.0.2
+      options: --user root
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Run DRC (errors fail the build)
+        run: |
+          kicad-cli pcb drc \
+            --exit-code-violations \
+            --severity-error \
+            --output drc-report.txt \
+            hardware/kicad-v3/abb-welcome-gateway-v3.kicad_pcb
+          cat drc-report.txt
+
+  firmware:
+    name: Build ESPHome firmware
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-python@v5
         with:
-          node-version: "20"
+          python-version: "3.12"
+          cache: pip
 
-      # Pure-node check, no install needed. Catches single-pin (dangling) nets.
-      - name: Check for dangling nets
-        run: node tools/check-dangling-nets.mjs
+      - name: Install ESPHome
+        run: pip install esphome
 
-      - name: Install tscircuit project deps
-        working-directory: output
-        run: npm ci
+      - name: Create dummy secrets
+        working-directory: firmware/esphome
+        run: cp secrets.yaml.example secrets.yaml
 
-      - name: Type-check the board (tsc --noEmit)
-        working-directory: output
-        run: npx tsc --noEmit
+      - name: Cache PlatformIO / ESP-IDF toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio
+            firmware/esphome/.esphome
+          key: esphome-${{ runner.os }}-${{ hashFiles('firmware/esphome/abb-welcome-gateway.yaml') }}
+          restore-keys: esphome-${{ runner.os }}-
+
+      - name: Compile firmware
+        working-directory: firmware/esphome
+        run: esphome compile abb-welcome-gateway.yaml
