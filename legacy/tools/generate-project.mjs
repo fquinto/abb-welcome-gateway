@@ -23,12 +23,12 @@ import { generateChipImport } from "./lib/chip-import-generator.mjs";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..");
 // EasyEDA v2 source files live under hardware/easyeda-v2/.
-const SRC_DIR = path.join(REPO_ROOT, "hardware", "easyeda-v2");
+const SRC_DIR = path.join(REPO_ROOT, "easyeda-v2");
 const SCH_FILE = "Bus_Interface_for_ABB-Welcome_v2_EasyEDA_Schematic.json";
 const PCB_FILE = "PCB_Bus_Interface_for_ABB-Welcome_v2_EasyEDA_PCB_2026-05-06.json";
 const NET_FILE = "Schematic.net";
 const BOM_FILE = "BOM.csv";
-const OUT_DIR = path.join(REPO_ROOT, "output");
+const OUT_DIR = path.join(REPO_ROOT, "tscircuit");
 
 // Designators that get their own imports/<NAME>.tsx wrapper, rather than
 // inline JSX. Pick chips with non-trivial datasheet pin labels.

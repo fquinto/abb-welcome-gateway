@@ -1,6 +1,6 @@
 # KiCad v3 — routing target
 
-KiCad project exported from the tscircuit v3 design (`output/index.circuit.tsx`)
+KiCad project exported from the tscircuit v3 design (`legacy/tscircuit/index.circuit.tsx`)
 so the board can be **routed in KiCad** (tscircuit's autorouter does not converge
 on this board and produces no copper pours, which this design needs — three GND
 islands, an RF module, the buck power stage and the 28 V bus all want planes /
@@ -19,7 +19,7 @@ Generated with `circuit-json-to-kicad` (KiCad file format `20241229`, i.e. KiCad
 ## Source-of-truth note
 
 Routing has started (and finished) here, so **this KiCad project is now the
-source of truth for the PCB**. The tscircuit side (`output/index.circuit.tsx`)
+source of truth for the PCB**. The tscircuit side (`legacy/tscircuit/index.circuit.tsx`)
 is frozen as schematic reference; it does NOT reflect the physical changes below.
 
 ### Divergences from the tscircuit source (v3.0 routed)

@@ -23,7 +23,7 @@ if (!pinLabels) {
 }
 
 const tsx = generateChipImport({ componentName, lcsc, pinLabels, manufacturerPartNumber: mpn });
-const outDir = path.join(REPO_ROOT, "output", "imports");
+const outDir = path.join(REPO_ROOT, "tscircuit", "imports");
 fs.mkdirSync(outDir, { recursive: true });
 const outFile = path.join(outDir, `${componentName}.tsx`);
 fs.writeFileSync(outFile, tsx);

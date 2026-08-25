@@ -19,7 +19,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..");
 const TARGET = process.argv[2]
     ? path.resolve(process.argv[2])
-    : path.join(REPO_ROOT, "output", "index.circuit.tsx");
+    : path.join(REPO_ROOT, "tscircuit", "index.circuit.tsx");
 
 const src = fs.readFileSync(TARGET, "utf8");
 

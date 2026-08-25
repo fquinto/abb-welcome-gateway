@@ -1,10 +1,10 @@
 .tmp/
-tools/node_modules/
+legacy/tools/node_modules/
 
-# tscircuit output project — build artefacts and local deps
-output/.tscircuit/
-output/dist/
-output/node_modules/
+# proyecto tscircuit (legacy) — build artefacts and local deps
+legacy/tscircuit/.tscircuit/
+legacy/tscircuit/dist/
+legacy/tscircuit/node_modules/
 # package-lock.json is tracked for reproducible installs (pinned deps)
 
 # KiCad local-only files (backups, per-user prefs, footprint cache)
