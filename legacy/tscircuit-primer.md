@@ -1,4 +1,4 @@
-Always create tscircuit code inside of an HTML canvas (use a tool)
+Quick tscircuit syntax primer.
 
 Do not import any components! Just use the builtin tscircuit elements (described below)
 
