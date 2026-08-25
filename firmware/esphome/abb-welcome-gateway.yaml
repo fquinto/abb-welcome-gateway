@@ -1,10 +1,23 @@
 # ABB-Welcome / Busch-Welcome gateway — ESPHome configuration.
 #
+# Uses ESPHome's native `abbwelcome` remote protocol (remote_base, >= 2024.4.0),
+# so no custom protocol code is needed. See ../../docs/protocol.md.
+#
 # Pin mapping (board v3.0):
-#   GPIO4  bus RX (Schmitt-buffered digital input)
-#   GPIO5  bus TX (open-drain driver chain)
+#   GPIO4  bus RX  (Schmitt-buffered digital input, BUS_RX_DIG)
+#   GPIO5  bus TX  (open-drain driver chain)
 #   GPIO6  status LED
 #   GPIO0  boot strap (driven by the FTDI auto-program circuit, do not use)
+#
+# Addresses and the door-open data payload below are installation-specific —
+# discover yours from the logs (dump: [abbwelcome]) and edit the substitutions.
+# See ../../docs/user-guide.md and ../../docs/protocol.md.
+
+substitutions:
+  indoor_address: "0x1001"    # this gateway's identity on the bus
+  door_lock_address: "0x4001"
+  outdoor_address: "0x2001"
+  three_byte_address: "false"
 
 esphome:
   name: abb-welcome-gateway
@@ -14,11 +27,6 @@ esp32:
   board: esp32-s3-devkitc-1
   framework:
     type: esp-idf
-
-external_components:
-  - source:
-      type: local
-      path: components
 
 logger:
 
@@ -39,18 +47,54 @@ captive_portal:
 status_led:
   pin:
     number: GPIO6
-    inverted: false
 
-abb_welcome:
-  id: bus
-  rx_pin: GPIO4
-  tx_pin: GPIO5
-  address: 0x00  # door station address, see docs/user-guide.md
+# NOTE: the RX front-end ends in a Schmitt inverter (74LVC1G14) and TX goes
+# through an open-drain stage, so the net logic polarity must be confirmed on
+# real hardware. If frames don't decode, try `inverted: true` on the receiver
+# and/or transmitter pin. See docs/TODO.md.
+remote_receiver:
+  pin:
+    number: GPIO4
+    mode:
+      input: true
+  dump: [abbwelcome]
+  # tolerance tuned for the bus timings (mark ~32us, bit period ~102us)
+  tolerance: 30%
+  on_abbwelcome:
+    # `x` is the decoded ABBWelcomeData frame. A call from the outdoor station
+    # (message type 0x01) fires the doorbell as a momentary pulse.
+    - if:
+        condition:
+          lambda: 'return x.get_message_type() == 0x01;'
+        then:
+          - binary_sensor.template.publish:
+              id: doorbell
+              state: ON
+          - delay: 3s
+          - binary_sensor.template.publish:
+              id: doorbell
+              state: OFF
+
+remote_transmitter:
+  pin:
+    number: GPIO5
+  carrier_duty_percent: 100%
 
 binary_sensor:
-  - platform: abb_welcome
+  - platform: template
+    id: doorbell
     name: "Doorbell"
+    device_class: occupancy
 
 button:
-  - platform: abb_welcome
+  - platform: template
     name: "Open Door"
+    icon: mdi:door-open
+    on_press:
+      - remote_transmitter.transmit_abbwelcome:
+          source_address: ${indoor_address}
+          destination_address: ${door_lock_address}
+          three_byte_address: ${three_byte_address}
+          message_type: 0x0D
+          # installation-specific door-opener secret — edit for your system
+          data: [0xAB, 0xCD, 0xEF]

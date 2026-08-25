@@ -61,13 +61,32 @@ converter — no external supply needed.
 After the first flash the device shows up in ESPHome/Home Assistant and can be
 updated over the air.
 
-## 5. Home Assistant integration
+## 5. Configure your installation
+
+The protocol is handled by ESPHome natively, but the bus **addresses** and the
+**door-opener secret** are specific to your installation. Find them once:
+
+1. Flash the default config and open the logs (`esphome logs
+   abb-welcome-gateway.yaml`). The `dump: [abbwelcome]` line prints every bus
+   frame.
+2. Ring the doorbell and open the door from an existing indoor station. Note the
+   `source_address`, `destination_address`, `message_type` and `data` of the
+   frames you see.
+3. Edit `abb-welcome-gateway.yaml`: set the `substitutions` (indoor / outdoor /
+   door-lock addresses) and the door-open `data` bytes in the
+   `transmit_abbwelcome` action. Set `three_byte_address: "true"` if your
+   addresses are 6 hex digits.
+4. Re-flash (OTA is fine after the first flash).
+
+See [protocol.md](protocol.md) for the message types and address conventions.
+
+## 6. Home Assistant integration
 
 With the ESPHome integration enabled, Home Assistant auto-discovers the device
 and creates:
 
-- `binary_sensor.doorbell` — rings when someone calls **[pending: protocol]**.
-- `button.open_door` — triggers the door opener **[pending: protocol]**.
+- `binary_sensor.doorbell` — pulses when the outdoor station calls.
+- `button.open_door` — sends the door-open command.
 
 Example automation (notification on ring):
 
@@ -84,7 +103,7 @@ automation:
           message: "Someone is at the door"
 ```
 
-## 6. Installation on the bus
+## 7. Installation on the bus
 
 **[pending: photos of a real installation]**
 
@@ -96,10 +115,11 @@ automation:
 4. Power the system back up: the `PWR` LED lights, and after a few seconds the
    device joins WiFi.
 
-## 7. Troubleshooting
+## 8. Troubleshooting
 
 | Symptom | Check |
 |---|---|
 | No `PWR` LED | Bus voltage present at `P1`? Polyfuse `F2` may have tripped after a fault — it self-resets when power is removed. |
 | Device not on WiFi | Serial logs via `P2` (`esphome logs`), check `secrets.yaml` credentials, antenna clearance. |
-| No doorbell events | **[pending: protocol]** check the `RX` LED blinks when the intercom is used; if it does, the front-end works and the issue is firmware-side. |
+| No doorbell events | Check the `RX` LED blinks when the intercom is used (front-end OK). Then check the logs decode frames: if `dump: [abbwelcome]` shows nothing, try `inverted: true` on the receiver pin; if it shows frames, set the right addresses (section 5). |
+| Door won't open | Confirm the door-open `data` bytes captured from a real unlock, and the destination address. TX polarity may need `inverted: true` on the transmitter pin. |

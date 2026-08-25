@@ -17,17 +17,21 @@ See [STATUS.md](STATUS.md) for the current state of each area.
 
 ## Firmware
 
-- [ ] **Bus protocol**: study the timing/framing of the ABB-Welcome 2-wire bus
-      (reference: the original mat931 firmware and bus captures) and document it
-      in `docs/protocol.md`.
-- [ ] Implement RX decode in the `abb_welcome` component (edge capture on
-      GPIO4 → frame parser → events).
-- [ ] Implement TX (door-open command) on GPIO5, including the address/config
-      needed to target the right door station.
-- [ ] Map events to entities: doorbell `binary_sensor`, door-open
-      `button`/`lock`, diagnostic sensors (bus activity, last frame).
-- [ ] Status LED behaviour on GPIO6 (boot / connected / bus activity).
-- [ ] Test on real hardware against an ABB-Welcome installation.
+Protocol done: ESPHome ships the `abbwelcome` remote protocol natively, so the
+config uses it directly (documented in `docs/protocol.md`). Remaining work is
+hardware-dependent:
+
+- [ ] **Confirm logic polarity on the board**: the RX front-end ends in a
+      Schmitt inverter (74LVC1G14) and TX is open-drain, so `remote_receiver` /
+      `remote_transmitter` may need `inverted: true`. Verify with a real frame.
+- [ ] **Discover addresses**: run with `dump: [abbwelcome]`, use the intercom,
+      read source/destination addresses from the logs and set them in the YAML
+      `substitutions`.
+- [ ] **Door-opener secret**: capture a real door-open frame (or trial) and put
+      its `data` bytes into the `transmit_abbwelcome` action.
+- [ ] Optional entities: a `lock` instead of a plain button, diagnostic sensors
+      (last message type, bus activity), 3-byte-address systems.
+- [ ] End-to-end test against a real ABB-Welcome / Busch-Welcome installation.
 
 ## Validation (first prototype)
 

@@ -56,15 +56,19 @@ physical aspects (real module footprint, board height, per-island placement,
 **status LED moved to GPIO6**). The authoritative list lives in
 [`hardware/kicad-v3/README.md`](../hardware/kicad-v3/README.md).
 
-## Firmware — skeleton
+## Firmware — configured, pending hardware validation
 
-[`firmware/esphome/`](../firmware/esphome/) contains an ESPHome configuration
-with a custom external component (`abb_welcome`) targeting the board's pinout
-(bus RX = GPIO4, bus TX = GPIO5, status LED = GPIO6).
+[`firmware/esphome/`](../firmware/esphome/) is an ESPHome configuration built on
+ESPHome's **native `abbwelcome` protocol** (in `remote_base` since 2024.4.0), so
+there is no custom protocol code to maintain. Pinout: bus RX = GPIO4,
+bus TX = GPIO5, status LED = GPIO6.
 
-- Component skeleton, Home Assistant entities and build wiring: **done**.
-- ABB-Welcome bus protocol (RX decode / TX frames): **in development** — see
-  [`TODO.md`](TODO.md).
+- Doorbell (`binary_sensor` via `on_abbwelcome`), door opener (`button` via
+  `transmit_abbwelcome`), status LED, WiFi/API/OTA: **done and compiling**.
+- **Pending on real hardware**: confirm RX/TX logic polarity (the front-end
+  has a Schmitt inverter and an open-drain TX stage — may need `inverted: true`),
+  and discover the installation's bus addresses and door-opener secret from the
+  logs. See [`TODO.md`](TODO.md) and [`protocol.md`](protocol.md).
 
 ## Documentation
 

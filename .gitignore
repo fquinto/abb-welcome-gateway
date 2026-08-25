@@ -15,3 +15,7 @@ hardware/kicad-v3/fp-info-cache
 # firmware local files
 firmware/esphome/secrets.yaml
 firmware/esphome/.esphome/
+
+# python bytecode
+__pycache__/
+*.pyc
