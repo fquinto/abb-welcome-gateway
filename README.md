@@ -46,6 +46,12 @@ For hardware development: open `hardware/kicad-v3/abb-welcome-gateway-v3.kicad_p
 in KiCad 9. Design rules, net classes and the ground-island scheme are described
 in [`hardware/kicad-v3/README.md`](hardware/kicad-v3/README.md).
 
+## Community & discussion
+
+Questions, ideas or want to share your build? Join the discussion on Telegram:
+
+[![Telegram](https://img.shields.io/badge/Telegram-Join%20the%20chat-2CA5E0.svg?logo=telegram)](https://t.me/abb_welcome_gateway)
+
 ## Donations for software development
 
 If this project is useful to you, you can support its development:
