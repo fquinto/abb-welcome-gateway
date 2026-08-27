@@ -31,16 +31,22 @@ truth for the board. Current state:
 
 ### To verify before fabrication
 
-- **L2 = 100 µH output inductor — in spec, but at the edge of it.** The TPS5430
-  datasheet allows 10–100 µH; with ~590 µF of bulk the control-loop crossover
-  (~1.5 kHz) sits below TI's recommended 3–30 kHz window. Stable thanks to the
-  tantalum/aluminium ESR, but sluggish. Do **not** swap C19/C6/C2/C4 for
-  low-ESR ceramics without adding the external compensation network. A bench
-  load-step / Bode measurement is recommended before a production run.
-- **TVS1 clamp vs buck abs-max.** SMBJ30A clamps at ~48 V, above the TPS5430's
-  36 V abs-max VIN. L3's series impedance plus the 36 V headroom cover the
-  normal band; for tighter VIN protection move the clamp ahead of L3 or use a
-  higher-VIN buck.
+- **L2 = 100 µH output inductor — in spec, at the top of the range, modelled
+  stable.** The TPS5430 datasheet allows 10–100 µH. A loop model calibrated to
+  TI's own worked example (see [`hardware/kicad-v3/analysis/`](../hardware/kicad-v3/analysis/))
+  puts the crossover at **~3.2 kHz** (bottom edge of TI's 3–30 kHz window) with
+  **~70° phase margin** — the aluminium electrolytic ESR zero lifts the crossover
+  above the LC-only estimate. Stable across the plausible ESR range (48–106°) and
+  load. Do **not** swap C19/C6/C2/C4 for low-ESR ceramics: the model shows phase
+  margin collapsing to ~19° (ringy) without the ESR zero. A bench load-step /
+  Bode measurement is still recommended before a production run to confirm the
+  crossover against the real electrolytic ESR.
+- **TVS1 clamp vs buck abs-max.** SMBJ30A clamps at ~48 V at full surge, above
+  the TPS5430's 36 V abs-max VIN. Analysis ([`analysis/tvs_clamp.py`](../hardware/kicad-v3/analysis/tvs_clamp.py))
+  shows the buck VIN only exceeds 36 V once the TVS conducts **> ~2.2 A**; L3 +
+  input caps cover fast transients, leaving a slow high-current overvoltage as
+  the residual gap (low probability on a 28 V bus). For tighter protection move
+  the clamp to the buck VIN node (after L3) or use a higher-VIN buck.
 
 ### Optional hardening
 
