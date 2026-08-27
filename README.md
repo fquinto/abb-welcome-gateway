@@ -46,6 +46,14 @@ For hardware development: open `hardware/kicad-v3/abb-welcome-gateway-v3.kicad_p
 in KiCad 9. Design rules, net classes and the ground-island scheme are described
 in [`hardware/kicad-v3/README.md`](hardware/kicad-v3/README.md).
 
+## Donations for software development
+
+If this project is useful to you, you can support its development:
+
+[![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://www.paypal.com/donate/?business=XQQJHGVPHLD7W&no_recurring=0&item_name=Thank+you+for+collaborating+and+helping+the+development+of+software+improvements.&currency_code=EUR)
+
+Thank you for collaborating and helping the development of software improvements.
+
 ## Credits & license
 
 The hardware derives from the original bus interface design by **mat931**.
