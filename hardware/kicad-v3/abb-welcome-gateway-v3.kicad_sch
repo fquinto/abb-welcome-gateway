@@ -8869,7 +8869,7 @@
 				)
 			)
 		)
-		(property "Value" "74LVC1G14"
+		(property "Value" "SN74LVC1G14DBVR"
 			(at 386.675 285.0538 0)
 			(effects
 				(font
@@ -8877,7 +8877,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "tscircuit:SOT-23-5"
 			(at 393.897 277.1038 90)
 			(effects
 				(font
@@ -10265,7 +10265,7 @@
 				)
 			)
 		)
-		(property "Value" ""
+		(property "Value" "61300611121"
 			(at 437.825 271.1038 0)
 			(effects
 				(font
@@ -10274,7 +10274,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "tscircuit:PinHeader_1x06_2.54mm"
 			(at 436.047 265.1038 90)
 			(effects
 				(font

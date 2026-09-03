@@ -3304,7 +3304,7 @@
 		)
 		(embedded_fonts no)
 	)
-	(footprint "tscircuit:chip"
+	(footprint "tscircuit:PinHeader_1x06_2.54mm"
 		(layer "F.Cu")
 		(uuid "33571500-14c0-8fc1-5cd8-34825b1026bd")
 		(at 112.282 88.629)
@@ -3320,7 +3320,7 @@
 				)
 			)
 		)
-		(property "Value" ""
+		(property "Value" "61300611121"
 			(at 0 3 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -6806,7 +6806,7 @@
 		)
 		(embedded_fonts no)
 	)
-	(footprint "tscircuit:74LVC1G14"
+	(footprint "tscircuit:SOT-23-5"
 		(layer "F.Cu")
 		(uuid "6da06960-1330-2b7f-4740-12625e4fafbd")
 		(at 88 91.9 180)
@@ -6821,7 +6821,7 @@
 				)
 			)
 		)
-		(property "Value" "74LVC1G14"
+		(property "Value" "SN74LVC1G14DBVR"
 			(at 0 3 180)
 			(layer "F.Fab")
 			(hide yes)
