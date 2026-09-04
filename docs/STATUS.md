@@ -55,22 +55,27 @@ truth for the board. Current state:
 - No dedicated BOOT button (GPIO0 is only driven by the FTDI auto-program
   circuit). A tactile to ground on GPIO0 would help if auto-program ever fails.
 
-### BOM parts to make explicit (raised in the first fab quote)
+### BOM parts made explicit (raised in the first fab quote — resolved)
 
 Two designators carried generic placeholders from the tscircuit → KiCad
-conversion and need exact orderable parts in the symbol/footprint for the next
-revision:
+conversion. The exact orderable parts are now set in the symbol/footprint, BOM
+and pos files, and the fab house confirmed both in the updated quote
+(2026-09-04, "It's updated, pls confirm."):
 
 - **P2 — 6-pin serial/programming header.** Exported with a generic `chip`
   footprint and empty value, but the copper is a real **1×6 through-hole header,
   2.54 mm pitch** (drill 1.3 mm) with the FTDI pinout GND / RTS / V3V3_ESP / RX /
-  TX / DTR. To be assembled with a **1×6 2.54 mm straight male pin header**
-  (e.g. Würth 61300611121). Give it a proper `Connector_PinHeader_2.54mm:...1x06`
-  footprint and value so it stops exporting blank.
-- **U3 — 74LVC1G14 needs the full part number.** The PCB footprint is 5-pad SMD
-  at 0.95 mm pitch, i.e. **SOT-23-5** — so the orderable part is
-  **SN74LVC1G14DBVR** (SOT-23-5), *not* the SC-70/SOT-353 `DCK`/`GW` variant
-  (0.65 mm pitch, wrong footprint). Set the full MPN in the BOM field.
+  TX / DTR. Assembled as a **1×6 2.54 mm straight male pin header**,
+  **Würth 61300611121** — footprint/value now `PinHeader_1x06_2.54mm` /
+  `61300611121` so it no longer exports blank.
+- **U3 — 74LVC1G14 full part number.** The PCB footprint is 5-pad SMD at 0.95 mm
+  pitch, i.e. **SOT-23-5**, so the orderable part is **SN74LVC1G14DBVR**
+  (SOT-23-5), *not* the SC-70/SOT-353 `DCK`/`GW` variant (0.65 mm pitch, wrong
+  footprint). Full MPN now set in the BOM field.
+
+For the passives left with a blank LCSC, the fab picked equivalent 0603/0805
+basic parts on its own (no confirmation needed) — including higher-voltage caps
+for `C_DCP1/2/3`/`C_U3` and an hFE-graded `S8050 J3Y` for `Q1–Q3`.
 
 ### Divergences from the legacy schematic capture
 
