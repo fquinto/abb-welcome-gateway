@@ -77,6 +77,26 @@ For the passives left with a blank LCSC, the fab picked equivalent 0603/0805
 basic parts on its own (no confirmation needed) — including higher-voltage caps
 for `C_DCP1/2/3`/`C_U3` and an hFE-graded `S8050 J3Y` for `Q1–Q3`.
 
+### First-article assembly review (5 units, 2026-09)
+
+The fab assembled 5 units (SMD soldered, THT `P1`/`P2` tacked then trimmed on
+ship) and asked us to confirm polarised parts, flagging the two electrolytic
+cans `C19` and `C23`:
+
+- **`C19`** (470 µF/16 V, RVT, buck 3V3 output) — measured OK, correct
+  orientation. `+` = `V3V3`, `−` = `PGND`.
+- **`C23`** (100 µF/50 V, VEJ, ~28 V bus rail) — the fab could not measure its
+  polarity because **it has no continuity to the bus terminal `P1` by design**:
+  `C23` sits on the *rectified/protected* rail, downstream of the input
+  rectifier, fuse `F2` and TVS `SMBJ30A`. Marked for them by adjacency —
+  `+` (`BUS_PWR`) = pad toward `F2`/`SMBJ30A`/`P1`; `−` (`BUS_GND`) = pad toward
+  the `R_PGND`/`R_DGND`/`R_BGND` star-point resistors.
+
+Root cause of the ambiguity: the `C19`/`C23` footprints (from the tscircuit →
+KiCad conversion) carry **no silkscreen polarity mark**. Fix for **v3.1**: add a
+`+` silk indicator next to the positive pad of `C19`/`C23` (and the polarised
+tantalums), so orientation no longer depends on measurement.
+
 ### Divergences from the legacy schematic capture
 
 The routed PCB diverges from `legacy/tscircuit/index.circuit.tsx` in a few
